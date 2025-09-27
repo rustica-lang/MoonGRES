@@ -25,6 +25,14 @@ default-members = ["./crates/*"]
 rust-version = "1.80"
 edition = "2021"
 
+[workspace.features]
+moongres = [
+    "moon/moongres",
+    "moonbuild/moongres",
+    "moonbuild-rupes-recta/moongres",
+    "moonutil/moongres",
+]
+
 [workspace.dependencies]
 n2 = { git = "https://github.com/moonbitlang/n2.git", rev = "2cb2af63170acf3852c61326d5883a71f3576615" }
 arcstr = { version = "1.2", features = ["serde"] }

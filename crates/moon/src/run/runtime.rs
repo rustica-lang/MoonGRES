@@ -30,6 +30,7 @@ use tokio::process::Command;
 
 macro_rules! cache {
     ($(
+        $(#[$attr:meta])*
         $id:ident(
             $first_candidate:expr
             $(,$candidate:expr)* $(,)?
@@ -39,12 +40,14 @@ macro_rules! cache {
         #[derive(Default)]
         pub struct RuntimeExecutableCache {
             $(
+                $(#[$attr])*
                 $id: OnceCell<PathBuf>
             ),*
         }
 
         impl RuntimeExecutableCache {
             $(
+                $(#[$attr])*
                 pub fn $id(&self) -> &Path {
                     self.$id.get_or_init(|| {
                         which::which($first_candidate)
@@ -59,7 +62,9 @@ macro_rules! cache {
 
 cache! {
     node("node", "node.cmd"),
-    moonrun("moonrun")
+    moonrun("moonrun"),
+    #[cfg(feature = "moongres")]
+    rustica_engine("rustica-engine", "rustica-engine.exe"),
 }
 
 /// A guarded command info that removes the temporary file/dir(s) when it gets
@@ -117,6 +122,19 @@ pub fn command_for_cached(
             }
             cmd.arg(mbt_executable);
             cmd.arg("--");
+            Ok(cmd.into())
+        }
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES => {
+            let mut cmd = Command::new(cache.rustica_engine());
+            if let Some(t) = test {
+                cmd.arg("moontest")
+                    .arg("--spec")
+                    .arg(serde_json::to_string(t).expect("valid test args"));
+            } else {
+                cmd.arg("run");
+            }
+            cmd.arg(mbt_executable).arg("--");
             Ok(cmd.into())
         }
         TargetBackend::Js => {

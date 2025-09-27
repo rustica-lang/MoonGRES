@@ -75,6 +75,8 @@ pub fn print_run_commands(
             let mut watfile = state.graph.file(*fid).name.clone();
             let cmd = match target_backend {
                 TargetBackend::Wasm | TargetBackend::WasmGC => "moonrun ",
+                #[cfg(feature = "moongres")]
+                TargetBackend::MoonGRES => "rustica-engine run ",
                 TargetBackend::Js => "node ",
                 TargetBackend::Native | TargetBackend::LLVM => {
                     // stub.o would be default for native and llvm, skip them

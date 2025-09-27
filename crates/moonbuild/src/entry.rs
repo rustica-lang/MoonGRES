@@ -574,6 +574,10 @@ pub fn run_run(
         TargetBackend::Wasm | TargetBackend::WasmGC => {
             crate::build::run_wat(&wat_path, &moonbuild_opt.args, moonbuild_opt.verbose)
         }
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES => {
+            crate::build::run_moongres(&wat_path, &moonbuild_opt.args, moonbuild_opt.verbose)
+        }
         TargetBackend::Js => {
             crate::build::run_js(&wat_path, &moonbuild_opt.args, moonbuild_opt.verbose)
         }
@@ -967,6 +971,17 @@ async fn execute_test(
         TargetBackend::Wasm | TargetBackend::WasmGC => {
             crate::runtest::run_wat(artifact_path, target_dir, args, file_test_info_map, verbose)
                 .await
+        }
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES => {
+            crate::runtest::run_moongres(
+                artifact_path,
+                target_dir,
+                args,
+                file_test_info_map,
+                verbose,
+            )
+            .await
         }
         TargetBackend::Js => {
             crate::runtest::run_js(
