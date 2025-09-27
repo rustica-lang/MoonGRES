@@ -98,8 +98,7 @@ static RUSTICA_ENGINE_EXECUTABLE: LazyLock<Option<std::path::PathBuf>> = LazyLoc
             let rv = candidates
                 .iter()
                 .map(|exe| exe_dir.join(exe))
-                .filter(|p| p.exists())
-                .next();
+                .find(|p| p.exists());
             if rv.is_some() {
                 return rv;
             }
