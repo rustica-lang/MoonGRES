@@ -248,6 +248,9 @@ pub enum SurfaceTarget {
     Wasm,
     #[default]
     WasmGC,
+    #[cfg(feature = "moongres")]
+    #[value(name = "moongres")]
+    MoonGRES,
     Js,
     Native,
     LLVM,
@@ -264,6 +267,10 @@ pub fn lower_surface_targets(st: &[SurfaceTarget]) -> Vec<TargetBackend> {
             SurfaceTarget::WasmGC => {
                 result.insert(TargetBackend::WasmGC);
             }
+            #[cfg(feature = "moongres")]
+            SurfaceTarget::MoonGRES => {
+                result.insert(TargetBackend::MoonGRES);
+            }
             SurfaceTarget::Js => {
                 result.insert(TargetBackend::Js);
             }
@@ -276,6 +283,8 @@ pub fn lower_surface_targets(st: &[SurfaceTarget]) -> Vec<TargetBackend> {
             SurfaceTarget::All => {
                 result.insert(TargetBackend::Wasm);
                 result.insert(TargetBackend::WasmGC);
+                #[cfg(feature = "moongres")]
+                result.insert(TargetBackend::MoonGRES);
                 result.insert(TargetBackend::Js);
                 // todo: enable native backend
                 // result.insert(TargetBackend::Native);
@@ -294,6 +303,8 @@ pub enum TargetBackend {
     Wasm,
     #[default]
     WasmGC,
+    #[cfg(feature = "moongres")]
+    MoonGRES,
     Js,
     Native,
     LLVM
@@ -310,6 +321,8 @@ impl TargetBackend {
         match self {
             Self::Wasm => "wasm",
             Self::WasmGC => "wasm-gc",
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => "wasm-gc", // TODO(xenia): change to moongres after compiler support
             Self::Js => "js",
             Self::Native => "native",
             Self::LLVM => "llvm",
@@ -320,6 +333,8 @@ impl TargetBackend {
         match self {
             Self::Wasm => "wasm",
             Self::WasmGC => "wasm",
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => "wasm",
             Self::Js => "js",
             Self::Native => "exe",
             Self::LLVM => "exe",
@@ -330,6 +345,8 @@ impl TargetBackend {
         match self {
             Self::Wasm => "wasm",
             Self::WasmGC => "wasm",
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => "wasm",
             Self::Js => "js",
             Self::Native => "c",
             Self::LLVM => O_EXT,
@@ -340,6 +357,8 @@ impl TargetBackend {
         match self {
             Self::Wasm => "wasm",
             Self::WasmGC => "wasm-gc",
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => "moongres",
             Self::Js => "js",
             Self::Native => "native",
             Self::LLVM => "llvm",
@@ -350,6 +369,8 @@ impl TargetBackend {
         match self {
             Self::Wasm => "wasm",
             Self::WasmGC => "wasm-gc",
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => "moongres",
             Self::Js => "js",
             Self::Native => "native",
             Self::LLVM => "llvm",
@@ -360,6 +381,8 @@ impl TargetBackend {
         match s {
             "wasm" => Ok(Self::Wasm),
             "wasm-gc" => Ok(Self::WasmGC),
+            #[cfg(feature = "moongres")]
+            "moongres" => Ok(Self::MoonGRES),
             "js" => Ok(Self::Js),
             "native" => Ok(Self::Native),
             "llvm" => Ok(Self::LLVM),
@@ -383,16 +406,28 @@ impl TargetBackend {
         match self {
             Self::Native | Self::LLVM => true,
             Self::Wasm | Self::WasmGC | Self::Js => false,
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => false,
         }
     }
 
     pub fn all() -> &'static [Self] {
-        &[Self::Wasm, Self::WasmGC, Self::Js, Self::Native, Self::LLVM]
+        &[
+            Self::Wasm,
+            Self::WasmGC,
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES,
+            Self::Js,
+            Self::Native,
+            Self::LLVM,
+        ]
     }
 
     pub fn supports_source_map(&self) -> bool {
         match self {
             Self::WasmGC | Self::Js => true,
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => true,
             Self::Wasm | Self::Native | Self::LLVM => false,
         }
     }
@@ -400,6 +435,8 @@ impl TargetBackend {
     pub fn is_wasm(&self) -> bool {
         match self {
             Self::Wasm | Self::WasmGC => true,
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => true,
             Self::Js | Self::Native | Self::LLVM => false,
         }
     }
@@ -407,6 +444,8 @@ impl TargetBackend {
     pub fn allowed_as_project_target(&self) -> bool {
         match self {
             Self::Wasm | Self::WasmGC | Self::Js | Self::Native => true,
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => true,
             Self::LLVM => false,
         }
     }

@@ -123,6 +123,13 @@ impl<'a> CmdlineAbstraction for MoonGenTestDriver<'a> {
         // Configuration
         args.extend([
             "--target".to_string(),
+            // TODO(xenia): remove this after compiler support
+            #[cfg(feature = "moongres")]
+            match (args.first().map(|s| s.as_str()), self.target_backend) {
+                (Some("moon"), TargetBackend::MoonGRES) => "moongres".to_string(),
+                _ => self.target_backend.to_flag().to_string(),
+            },
+            #[cfg(not(feature = "moongres"))]
             self.target_backend.to_flag().to_string(),
         ]);
         args.extend(["--pkg-name".to_string(), self.pkg_name.to_string()]);

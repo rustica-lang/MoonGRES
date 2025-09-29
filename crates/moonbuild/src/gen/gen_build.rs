@@ -1509,6 +1509,8 @@ pub fn gen_n2_build_state(
                 let runtime = match moonc_opt.link_opt.target_backend {
                     TargetBackend::Native | TargetBackend::LLVM => "".to_string(),
                     TargetBackend::Wasm | TargetBackend::WasmGC => "moonrun".to_string(),
+                    #[cfg(feature = "moongres")]
+                    TargetBackend::MoonGRES => "rustica-engine run".to_string(),
                     TargetBackend::Js => "node".to_string(),
                 };
 
