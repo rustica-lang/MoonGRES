@@ -86,6 +86,10 @@ impl CondExpr {
             (TargetBackend::Wasm, OptLevel::Release),
             (TargetBackend::WasmGC, OptLevel::Debug),
             (TargetBackend::WasmGC, OptLevel::Release),
+            #[cfg(feature = "moongres")]
+            (TargetBackend::MoonGRES, OptLevel::Debug),
+            #[cfg(feature = "moongres")]
+            (TargetBackend::MoonGRES, OptLevel::Release),
             (TargetBackend::Js, OptLevel::Debug),
             (TargetBackend::Js, OptLevel::Release),
             (TargetBackend::Native, OptLevel::Debug),
@@ -128,6 +132,8 @@ impl Default for CompileCondition {
             backend: vec![
                 TargetBackend::Wasm,
                 TargetBackend::WasmGC,
+                #[cfg(feature = "moongres")]
+                TargetBackend::MoonGRES,
                 TargetBackend::Js,
                 TargetBackend::Native,
                 TargetBackend::LLVM,
@@ -264,6 +270,8 @@ pub fn parse_cond_target(expr: &str) -> Result<CondExpr, ParseTargetError> {
         "debug" => Ok(CondExpr::Atom(Atom::OptLevel(OptLevel::Debug))),
         "wasm" => Ok(CondExpr::Atom(Atom::Target(TargetBackend::Wasm))),
         "wasm-gc" => Ok(CondExpr::Atom(Atom::Target(TargetBackend::WasmGC))),
+        #[cfg(feature = "moongres")]
+        "moongres" => Ok(CondExpr::Atom(Atom::Target(TargetBackend::MoonGRES))),
         "js" => Ok(CondExpr::Atom(Atom::Target(TargetBackend::Js))),
         "native" => Ok(CondExpr::Atom(Atom::Target(TargetBackend::Native))),
         "llvm" => Ok(CondExpr::Atom(Atom::Target(TargetBackend::LLVM))),
@@ -349,6 +357,8 @@ impl From<CondExpr> for StringOrArray {
                 Atom::Target(tb) => match tb {
                     TargetBackend::Wasm => StringOrArray::String("wasm".to_string()),
                     TargetBackend::WasmGC => StringOrArray::String("wasm-gc".to_string()),
+                    #[cfg(feature = "moongres")]
+                    TargetBackend::MoonGRES => StringOrArray::String("moongres".to_string()),
                     TargetBackend::Js => StringOrArray::String("js".to_string()),
                     TargetBackend::Native => StringOrArray::String("native".to_string()),
                     TargetBackend::LLVM => StringOrArray::String("llvm".to_string()),

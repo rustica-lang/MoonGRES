@@ -22,6 +22,9 @@ version = "0.1.0"
 rust-version.workspace = true
 edition.workspace = true
 
+[features]
+moongres = [ "moonutil/moongres" ]
+
 [dependencies]
 moonutil.workspace = true
 mooncake.workspace = true

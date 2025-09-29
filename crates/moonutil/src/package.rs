@@ -379,6 +379,13 @@ impl LinkDepItem {
     pub fn wasm_gc_shared_memory(&self) -> Option<bool> { self.link.as_ref()?.wasm_gc.as_ref()?.shared_memory }
     pub fn wasm_gc_link_flags(&self) -> Option<&[String]> { self.link.as_ref()?.wasm_gc.as_ref()?.flags.as_deref() }
 
+    #[cfg(feature = "moongres")]
+    pub fn moongres_memory_limits(&self) -> Option<&MemoryLimits> { self.link.as_ref()?.moongres.as_ref()?.memory_limits.as_ref() }
+    #[cfg(feature = "moongres")]
+    pub fn moongres_shared_memory(&self) -> Option<bool> { self.link.as_ref()?.moongres.as_ref()?.shared_memory }
+    #[cfg(feature = "moongres")]
+    pub fn moongres_link_flags(&self) -> Option<&[String]> { self.link.as_ref()?.moongres.as_ref()?.flags.as_deref() }
+
     pub fn js_exports(&self) -> Option<&[String]> { self.link.as_ref()?.js.as_ref()?.exports.as_deref() }
 
     pub fn native_exports(&self) -> Option<&[String]> { self.link.as_ref()?.native.as_ref()?.exports.as_deref() }
@@ -387,6 +394,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_exports(),
             WasmGC => self.wasm_gc_exports(),
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => None,
             Js => self.js_exports(),
             Native => self.native_exports(),
             LLVM => None,
@@ -397,6 +406,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_export_memory_name(),
             WasmGC => self.wasm_gc_export_memory_name(),
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => None,
             Js => None,
             Native => None,
             LLVM => None,
@@ -407,6 +418,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_heap_start_address(),
             WasmGC => None,
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => None,
             Js => None,
             Native => None,
             LLVM => None,
@@ -417,6 +430,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_import_memory(),
             WasmGC => self.wasm_gc_import_memory(),
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => None,
             Js => None,
             Native => None,
             LLVM => None,
@@ -427,6 +442,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_memory_limits(),
             WasmGC => self.wasm_gc_memory_limits(),
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => self.moongres_memory_limits(),
             Js => None,
             Native => None,
             LLVM => None,
@@ -437,6 +454,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_shared_memory(),
             WasmGC => self.wasm_gc_shared_memory(),
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => self.moongres_shared_memory(),
             Js => None,
             Native => None,
             LLVM => None,
@@ -447,6 +466,8 @@ impl LinkDepItem {
         match b {
             Wasm => self.wasm_link_flags(),
             WasmGC => self.wasm_gc_link_flags(),
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => self.moongres_link_flags(),
             Js => None,
             Native => None,
             LLVM => None,
@@ -603,6 +624,20 @@ pub struct WasmGcLinkConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+#[cfg(feature = "moongres")]
+pub struct MoonGRESLinkConfig {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub memory_limits: Option<MemoryLimits>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shared_memory: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flags: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, JsonSchema)]
 pub struct JsLinkConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exports: Option<Vec<String>>,
@@ -644,6 +679,11 @@ pub struct Link {
     #[serde(rename = "wasm-gc")]
     pub wasm_gc: Option<WasmGcLinkConfig>,
 
+    #[cfg(feature = "moongres")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "moongres")]
+    pub moongres: Option<MoonGRESLinkConfig>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub js: Option<JsLinkConfig>,
 
@@ -655,6 +695,8 @@ impl Link {
     pub fn need_link(&self, target: TargetBackend) -> bool {
         match target {
             Wasm | WasmGC | Js => true,
+            #[cfg(feature = "moongres")]
+            TargetBackend::MoonGRES => true,
             Native | LLVM => self.native.as_ref().is_some_and(|n| {
                 n.cc.is_some()
                     || n.cc_flags.is_some()

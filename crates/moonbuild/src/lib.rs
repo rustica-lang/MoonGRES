@@ -89,3 +89,21 @@ static PYTHON_EXECUTABLE: LazyLock<Option<std::path::PathBuf>> = LazyLock::new(|
         .iter()
         .find_map(|name| which::which(name).ok())
 });
+#[cfg(feature = "moongres")]
+static RUSTICA_ENGINE_EXECUTABLE: LazyLock<Option<std::path::PathBuf>> = LazyLock::new(|| {
+    let candidates = ["rustica-engine.exe", "rustica-engine"];
+    // Prefer the one next to the current executable
+    if let Ok(current_exe) = std::env::current_exe() {
+        if let Some(exe_dir) = current_exe.parent() {
+            let rv = candidates
+                .iter()
+                .map(|exe| exe_dir.join(exe))
+                .find(|p| p.exists());
+            if rv.is_some() {
+                return rv;
+            }
+        }
+    }
+    // Fallback to search in PATH
+    candidates.iter().find_map(|exe| which::which(exe).ok())
+});

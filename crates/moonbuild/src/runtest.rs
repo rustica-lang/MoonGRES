@@ -81,6 +81,26 @@ pub async fn run_wat(
     run(path, cmd, target_dir, file_test_info_map, verbose).await
 }
 
+#[cfg(feature = "moongres")]
+pub async fn run_moongres(
+    path: &Path,
+    target_dir: &Path,
+    args: &TestArgs,
+    file_test_info_map: &FileTestInfo,
+    verbose: bool,
+) -> anyhow::Result<Vec<Result<TestStatistics, TestFailedStatus>>> {
+    let mut cmd = tokio::process::Command::new(
+        crate::RUSTICA_ENGINE_EXECUTABLE
+            .as_deref()
+            .context("Unable to find the `rustica-engine` executable, please reinstall")?,
+    );
+    cmd.arg("moontest")
+        .arg("--spec")
+        .arg(serde_json_lenient::to_string(args).expect("valid JSON"))
+        .arg(path);
+    run(path, cmd, target_dir, file_test_info_map, verbose).await
+}
+
 pub async fn run_js(
     path: &Path,
     target_dir: &Path,

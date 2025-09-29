@@ -338,6 +338,10 @@ fn linked_core_artifact_ext(
     match backend {
         TargetBackend::Wasm | TargetBackend::WasmGC if wasm_use_wat => ".wat",
         TargetBackend::Wasm | TargetBackend::WasmGC => ".wasm",
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES if wasm_use_wat => ".wat",
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES => ".wasm",
         TargetBackend::Js => ".js",
         TargetBackend::Native => ".c",
         TargetBackend::LLVM => object_file_ext(os),
@@ -353,6 +357,10 @@ fn make_executable_artifact_ext(
     match backend {
         TargetBackend::Wasm | TargetBackend::WasmGC if wasm_use_wat => ".wat",
         TargetBackend::Wasm | TargetBackend::WasmGC => ".wasm",
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES if wasm_use_wat => ".wat",
+        #[cfg(feature = "moongres")]
+        TargetBackend::MoonGRES => ".wasm",
         TargetBackend::Js => ".js",
         TargetBackend::Native | TargetBackend::LLVM => executable_ext(os, legacy_behavior),
     }

@@ -50,6 +50,20 @@ pub fn run_wat(path: &Path, args: &[String], verbose: bool) -> anyhow::Result<()
     run(cmd, verbose)
 }
 
+#[cfg(feature = "moongres")]
+pub fn run_moongres(path: &Path, args: &[String], verbose: bool) -> anyhow::Result<()> {
+    let mut cmd = Command::new(
+        crate::RUSTICA_ENGINE_EXECUTABLE
+            .as_deref()
+            .context("Unable to find the `rustica-engine` executable, please reinstall")?,
+    );
+    cmd.arg("run").arg(path);
+    if !args.is_empty() {
+        cmd.arg("--").args(args);
+    }
+    run(cmd, verbose)
+}
+
 pub fn run_js(path: &Path, args: &[String], verbose: bool) -> anyhow::Result<()> {
     let mut cmd = Command::new(
         NODE_EXECUTABLE
