@@ -21,7 +21,7 @@
 use std::path::PathBuf;
 
 use log::debug;
-use moonutil::{common::TargetBackend, cond_expr::OptLevel, mooncakes::result::ResolvedEnv};
+use moonutil::{cond_expr::OptLevel, mooncakes::result::ResolvedEnv};
 use n2::graph::{Build, Graph as N2Graph};
 
 use crate::{

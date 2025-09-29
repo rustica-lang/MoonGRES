@@ -402,7 +402,7 @@ pub fn gen_build_interface_command(
 
     let mut build = Build::new(loc, ins, outs);
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.build_opt.target_backend.moonc())
         .arg("build-interface")
         .arg(&item.mbti_deps)
         .arg("-o")
@@ -505,7 +505,7 @@ pub fn gen_build_command(
         moonc_opt.build_opt.strip_flag,
     );
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.build_opt.target_backend.moonc())
         .arg("build-package")
         .args_with_cond(moonc_opt.render, vec!["-error-format", "json"])
         .args_with_cond(
@@ -638,7 +638,7 @@ pub fn gen_link_command(
         moonc_opt.build_opt.strip_flag,
     );
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.link_opt.target_backend.moonc())
         .arg("link-core")
         .args(&item.core_deps)
         .arg("-main")

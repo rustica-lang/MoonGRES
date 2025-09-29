@@ -89,7 +89,7 @@ impl<'a> BuildPlanLowerContext<'a> {
 
         BuildCommand {
             extra_inputs: files_vec.clone(),
-            commandline: cmd.build_command("moonc"),
+            commandline: cmd.build_command(self.opt.target_backend.moonc()),
         }
     }
 
@@ -149,7 +149,7 @@ impl<'a> BuildPlanLowerContext<'a> {
         // TODO: a lot of knobs are not controlled here
 
         BuildCommand {
-            commandline: cmd.build_command("moonc"),
+            commandline: cmd.build_command(self.opt.target_backend.moonc()),
             extra_inputs: files,
         }
     }
@@ -228,7 +228,7 @@ impl<'a> BuildPlanLowerContext<'a> {
 
         BuildCommand {
             extra_inputs: vec![],
-            commandline: cmd.build_command("moonc"),
+            commandline: cmd.build_command(self.opt.target_backend.moonc()),
         }
     }
 
@@ -476,7 +476,7 @@ impl<'a> BuildPlanLowerContext<'a> {
 
         BuildCommand {
             extra_inputs: vec![],
-            commandline: cmd.build_command("moonc"),
+            commandline: cmd.build_command(self.opt.target_backend.moonc()),
         }
     }
 

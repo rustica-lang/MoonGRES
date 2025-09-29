@@ -224,6 +224,18 @@ const COMMON_TEMPLATE: &str = include_str!(concat!(
     "/../moonbuild/template/test_driver/common.mbt"
 ));
 
+#[cfg(feature = "moongres")]
+const MOONGRES_BENCH_DRIVER_TEMPLATE: &str = include_str!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../moonbuild/template/test_driver/moongres/bench_driver_template.mbt"
+));
+
+#[cfg(feature = "moongres")]
+const MOONGRES_TEST_DRIVER_TEMPLATE: &str = include_str!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../moonbuild/template/test_driver/moongres/test_driver_template.mbt"
+));
+
 fn generate_driver(
     data: &MooncGenTestInfo,
     pkgname: &str,
@@ -246,7 +258,13 @@ fn generate_driver(
         TEST_DRIVER_TEMPLATE
     };
     let mut template = template.to_string();
-    if !enable_bench {
+    if enable_bench {
+        #[cfg(feature = "moongres")]
+        template.push_str(MOONGRES_BENCH_DRIVER_TEMPLATE);
+    } else {
+        #[cfg(feature = "moongres")]
+        template.push_str(MOONGRES_TEST_DRIVER_TEMPLATE);
+
         if only_no_arg_tests {
             template.push_str(NO_ARGS_TEMPLATE)
         } else {

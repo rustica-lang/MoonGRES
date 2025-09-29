@@ -1174,7 +1174,7 @@ pub fn gen_runtest_build_command(
         moonc_opt.build_opt.strip_flag,
     );
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.build_opt.target_backend.moonc())
         .arg("build-package")
         .args_with_cond(moonc_opt.render, vec!["-error-format", "json"])
         .args(&item.mbt_deps)
@@ -1311,7 +1311,7 @@ pub fn gen_runtest_link_command(
         moonc_opt.build_opt.strip_flag,
     );
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.link_opt.target_backend.moonc())
         .arg("link-core")
         .args(&item.core_deps)
         .arg("-main")
