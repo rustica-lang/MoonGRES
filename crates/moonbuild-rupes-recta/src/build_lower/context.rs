@@ -307,11 +307,7 @@ impl<'a> BuildPlanLowerContext<'a> {
     pub(super) fn set_flags(&self, flags: &mut compiler::CompilationFlags) {
         flags.no_opt = self.opt.opt_level == OptLevel::Debug;
         flags.symbols = self.opt.debug_symbols;
-        flags.source_map = self.opt.debug_symbols
-            && matches!(
-                self.opt.target_backend,
-                TargetBackend::Js | TargetBackend::WasmGC
-            );
+        flags.source_map = self.opt.debug_symbols && self.opt.target_backend.supports_source_map();
     }
 
     /// **For debug use only.** Prints debug information about a specific build
