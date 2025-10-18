@@ -219,7 +219,7 @@ pub fn gen_build_command(
         moonc_opt.build_opt.strip_flag,
     );
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.build_opt.target_backend.moonc())
         .arg("build-package")
         .args_with_cond(moonc_opt.render, vec!["-error-format", "json"])
         .args(&item.mbt_deps)
@@ -258,7 +258,7 @@ fn gen_bundle_all(
     graph: &mut n2graph::Graph,
     bundle_all: &N2BundleAll,
     target_dir: &Path,
-    _moonc_opt: &MooncOpt,
+    moonc_opt: &MooncOpt,
 ) -> Build {
     let loc = FileLoc {
         filename: Rc::new(PathBuf::from("bundle")),
@@ -290,7 +290,7 @@ fn gen_bundle_all(
 
     let mut build = Build::new(loc, ins, outs);
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.build_opt.target_backend.moonc())
         .arg("bundle-core")
         .args(bundle_all.order.iter())
         .arg("-o")

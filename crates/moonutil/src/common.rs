@@ -304,6 +304,7 @@ pub enum TargetBackend {
     #[default]
     WasmGC,
     #[cfg(feature = "moongres")]
+    #[value(name = "moongres")]
     MoonGRES,
     Js,
     Native,
@@ -322,7 +323,7 @@ impl TargetBackend {
             Self::Wasm => "wasm",
             Self::WasmGC => "wasm-gc",
             #[cfg(feature = "moongres")]
-            Self::MoonGRES => "wasm-gc", // TODO(xenia): change to moongres after compiler support
+            Self::MoonGRES => "moongres",
             Self::Js => "js",
             Self::Native => "native",
             Self::LLVM => "llvm",
@@ -435,6 +436,14 @@ impl TargetBackend {
             #[cfg(feature = "moongres")]
             Self::MoonGRES => true,
             Self::Wasm | Self::Native | Self::LLVM => false,
+        }
+    }
+
+    pub fn moonc(self) -> &'static str {
+        match self {
+            #[cfg(feature = "moongres")]
+            Self::MoonGRES => "mgresc",
+            _ => "moonc",
         }
     }
 

@@ -231,8 +231,12 @@ fn run_single_mbt_file(cli: &UniversalFlags, cmd: RunSubcommand) -> anyhow::Resu
     };
 
     if cli.dry_run {
-        println!("moonc {}", build_package_command.join(" "));
-        println!("moonc {}", link_core_command.join(" "));
+        println!(
+            "{} {}",
+            target_backend.moonc(),
+            build_package_command.join(" ")
+        );
+        println!("{} {}", target_backend.moonc(), link_core_command.join(" "));
         if let Some(compile_exe_command) = compile_exe_command {
             println!("{}", compile_exe_command.join(" "));
         }
@@ -258,7 +262,7 @@ fn run_single_mbt_file(cli: &UniversalFlags, cmd: RunSubcommand) -> anyhow::Resu
         return Ok(0);
     }
 
-    let moonc_build_package = std::process::Command::new("moonc")
+    let moonc_build_package = std::process::Command::new(target_backend.moonc())
         .args(&build_package_command)
         .stdout(std::process::Stdio::inherit())
         .stderr(std::process::Stdio::inherit())
@@ -266,10 +270,14 @@ fn run_single_mbt_file(cli: &UniversalFlags, cmd: RunSubcommand) -> anyhow::Resu
         .wait()?;
 
     if !moonc_build_package.success() {
-        bail!("failed to run: moonc {}", build_package_command.join(" "))
+        bail!(
+            "failed to run: {} {}",
+            target_backend.moonc(),
+            build_package_command.join(" ")
+        )
     }
 
-    let moonc_link_core = std::process::Command::new("moonc")
+    let moonc_link_core = std::process::Command::new(target_backend.moonc())
         .args(&link_core_command)
         .stdout(std::process::Stdio::inherit())
         .stderr(std::process::Stdio::inherit())
@@ -277,7 +285,11 @@ fn run_single_mbt_file(cli: &UniversalFlags, cmd: RunSubcommand) -> anyhow::Resu
         .wait()?;
 
     if !moonc_link_core.success() {
-        bail!("failed to run: moonc {}", link_core_command.join(" "))
+        bail!(
+            "failed to run: {} {}",
+            target_backend.moonc(),
+            link_core_command.join(" ")
+        )
     }
 
     if let Some(compile_exe_command) = compile_exe_command {

@@ -528,7 +528,7 @@ pub fn gen_check_command(
 
     let mut build = Build::new(loc, ins, outs);
 
-    let command = CommandBuilder::new("moonc")
+    let command = CommandBuilder::new(moonc_opt.build_opt.target_backend.moonc())
         .arg("check")
         .arg_with_cond(item.patch_file.is_some(), "-patch-file")
         .lazy_args_with_cond(item.patch_file.is_some(), || {
